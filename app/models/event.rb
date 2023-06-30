@@ -53,4 +53,8 @@ class Event < ApplicationRecord
   def end_date
     end_time.to_date
   end
+
+  def open_for_voting?
+    started? && Time.current.before?(end_time.next_day)
+  end
 end
