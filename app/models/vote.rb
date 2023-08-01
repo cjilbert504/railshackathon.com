@@ -9,7 +9,7 @@ class Vote < ApplicationRecord
   validates :entry_id, uniqueness: {scope: :user_id}
   validate :user_can_have_only_five_votes
 
-  after_commit :update_entry_points
+  after_commit :update_entry_vote_points, :update_points_for_user_selections
 
   MAXIMUM = 5
 
@@ -19,13 +19,13 @@ class Vote < ApplicationRecord
     end
   end
 
+  def update_entry_vote_points
+    entry.update_entry_total_points
+  end
+
   private
 
-  def update_entry_points
-    self.entry.update_entry_total_points
-
-    user.votes.each do |vote|
-      vote.entry.update_entry_total_points
-    end
+  def update_points_for_user_selections
+    user.votes.each &:update_entry_vote_points
   end
 end
